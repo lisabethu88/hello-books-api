@@ -73,7 +73,7 @@ def create_book():
     return make_response(f"Book {new_book.title} successfully created", 201)
 
 @books_bp.route("", methods=["GET"])
-def get_books():
+def read_all_books():
     books = Book.query.all()
     books_response = []
     for book in books:
@@ -82,7 +82,7 @@ def get_books():
             "title": book.title,
             "description": book.description
         })
-    return books_response
+    return jsonify(books_response)
 
 @books_bp.route("/<book_id>", methods=["GET"])
 def handle_book(book_id):
@@ -92,3 +92,16 @@ def handle_book(book_id):
             "title": book.title,
             "description": book.description
             }
+
+@books_bp.route("/<book_id>", methods=["PUT"])
+def update_book(book_id):
+    book = validate_book(book_id)
+    request_body = request.get_json()
+    book.title = request_body["title"]
+    book.description = request_body["description"]
+    db.session.commit()
+    return make_response(f"Book #{book.id} successfully updated")
+
+
+
+
