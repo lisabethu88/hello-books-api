@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, abort, make_response
 
-class Book:
+""" class Book:
     def __init__(self, id, title, description):
         self.id = id
         self.title = title
@@ -43,6 +43,6 @@ def handle_book(book_id):
                 "title": book.title,
                 "description": book.description,
                 }
-
+"""
 
 
