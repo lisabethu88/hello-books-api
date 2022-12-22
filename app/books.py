@@ -1,6 +1,7 @@
 from app import db
 from app.models.book import Book
 from flask import jsonify, abort, make_response, request
+from sqlalchemy import desc, asc
 
 # class Book:
 #     def __init__(self, id, title, description):
@@ -71,13 +72,20 @@ def create_book_implementation():
     return make_response(f"Book {new_book.title} successfully created", 201)
 
 def read_all_books_implementation():
-    title_query = request.args.get("title")
+    # title_query = request.args.get("title")
 
-    if title_query:
-        books = Book.query.filter_by(title=title_query)
-    else:
-        books = Book.query.all()
-        
+    # if title_query:
+    #     books = Book.query.filter_by(title=title_query)
+    # else:
+    #     books = Book.query.all()
+    
+    sort_query = request.args.get("sort")
+    dir_query = request.args.get("direction")
+    if dir_query == "desc":
+        books = Book.query.order_by(desc(sort_query))
+    elif dir_query == "asc":
+        books = Book.query.order_by(asc(sort_query))
+
     books_response = []
 
     for book in books:
