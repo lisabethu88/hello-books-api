@@ -70,20 +70,28 @@ def create_book_implementation():
 
     return make_response(f"Book {new_book.title} successfully created", 201)
 
-
 def read_all_books_implementation():
-    books = Book.query.all()
+    title_query = request.args.get("title")
+
+    if title_query:
+        books = Book.query.filter_by(title=title_query)
+    else:
+        books = Book.query.all()
+        
     books_response = []
+
     for book in books:
         books_response.append({
             "id": book.id,
             "title": book.title,
             "description": book.description
         })
+
     return jsonify(books_response)
 
 def handle_book_implementation(book_id):
     book = validate_book(book_id)
+
     return {
             "id": book.id,
             "title": book.title,
@@ -96,12 +104,14 @@ def update_book_implementation(book_id):
     book.title = request_body["title"]
     book.description = request_body["description"]
     db.session.commit()
+
     return make_response(f"Book #{book.id} successfully updated")
 
 def delete_book_implementation(book_id):
     book = validate_book(book_id)
     db.session.delete(book)
     db.session.commit()
+
     return make_response(f"Book #{book.id} successfully deleted")
 
 
