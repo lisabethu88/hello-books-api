@@ -49,25 +49,27 @@ from sqlalchemy import desc, asc
 #                 "description": book.description,
 #                 }
 
-# ---Helpers----
-def validate_book(book_id):
+# ----Helpers----
+def validate_model(cls, model_id):
     try:
-        book_id = int(book_id)
+        model_id = int(model_id)
     except:
-        abort(make_response({"message":f"book {book_id} invalid"}, 400))
+        abort(make_response({"message":f"{cls.__name__} {model_id} invalid"}, 400))
 
-    book = Book.query.get(book_id)
-    if not book:
-        abort(make_response({"message":f"book {book_id} not found"}, 404))
+    model = cls.query.get(model_id)
+    if not model:
+        abort(make_response({"message":f"{cls.__name__} {model_id} not found"}, 404))
 
-    return book
+    return model
 
+# -------Routes-------
 books_bp = Blueprint("books", __name__, url_prefix="/books")
 
 @books_bp.route("", methods=["POST"])
 def create_book():
     request_body = request.get_json()
     new_book = Book.from_dict(request_body)
+
 
     db.session.add(new_book)
     db.session.commit()
@@ -99,13 +101,13 @@ def read_all_books():
     return jsonify(books_response)
 
 @books_bp.route("/<book_id>", methods=["GET"])
-def handle_book(book_id):
-    book = validate_book(book_id)
+def read_one_book(book_id):
+    book = validate_model(Book, book_id)
     return book.to_dict()
 
 @books_bp.route("/<book_id>", methods=["PUT"])
 def update_book(book_id):
-    book = validate_book(book_id)
+    book = validate_model(Book, book_id)
     request_body = request.get_json()
     book.title = request_body["title"]
     book.description = request_body["description"]
@@ -115,7 +117,7 @@ def update_book(book_id):
 
 @books_bp.route("/<book_id>", methods=["DELETE"])
 def delete_book(book_id):
-    book = validate_book(book_id)
+    book = validate_model(Book, book_id)
     db.session.delete(book)
     db.session.commit()
 
