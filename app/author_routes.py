@@ -33,7 +33,6 @@ def read_all_authors():
 
 @authors_bp.route("/<author_id>/books", methods=["POST"])
 def create_book(author_id):
-
     author = validate_model(Author, author_id)
     request_body = request.get_json()
     new_book = Book.from_dict(request_body)
@@ -46,3 +45,9 @@ def create_book(author_id):
 @authors_bp.route("/<author_id>/books", methods=["GET"])
 def read_books(author_id):
     author = validate_model(Author, author_id)
+    books_response = []
+
+    for book in author.books:
+        books_response.append(book.to_dict())
+
+    return jsonify(books_response)
